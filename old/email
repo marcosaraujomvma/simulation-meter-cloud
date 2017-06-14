@@ -1,0 +1,5 @@
+Exemplo requisição
+curl -i -H "Content-Type: application/json" -X POST -d '{"valor":81,"timestamp":'$(date +%s)',"idMedidor":"f55ff16f66f43360266b95db6f8fec01d76031054306ae4a4b380598f6cfd114"}' localhost:5000
+
+Att,
+Girrese
