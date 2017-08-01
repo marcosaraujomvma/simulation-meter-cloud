@@ -1,0 +1,9 @@
+Digite o id do medidor:
+10
+
+Digite o periodo Inicial: 
+1494594836.88
+
+Digite o periodo Final: 
+1494594840.58
+

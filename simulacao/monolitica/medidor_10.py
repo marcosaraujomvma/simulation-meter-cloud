@@ -5,7 +5,7 @@
 import socket
 import hashlib
 import time
-import random
+import random, sys
 from Crypto.PublicKey import RSA
 
 
@@ -18,38 +18,41 @@ def criarHash(texto):
     return (hash.hexdigest())
 
 
-fpr = open("chaves/medidor01_Privatekey.pem")
+fpr = open("keys/meter-private.pem")
 keypr = RSA.importKey(fpr.read())
 print "LEU CHAVE PRIVADA 1024 DO MEDIDOR\n"
 
-fpucl = open("chaves/cloudPublic.pem")
+fpucl = open("keys/cloud-public")
 keypucl = RSA.importKey(fpucl.read())
 print "LEU CHAVE PUBLICA 4096 DA NUVEM \n"
 
 HOST = 'localhost'     # Endereco IP do Servidor
-PORT = 8085            # Porta que o Servidor esta
+PORT = 10010            # Porta que o Servidor esta
 #tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #dest = (HOST, PORT)
 #tcp.connect(dest)
 
+id_medidor = sys.argv[1]
+
+#id_medidor = raw_input("Digite o id do medidor: \n")
 
 
 i =0
-
-while i <5000000:
+#86400
+while i <2880:
     
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     dest = (HOST, PORT)   
     tcp.connect(dest)
  
-    time.sleep(0.3)#espera 1 segundo
+    time.sleep(1)#espera 1 segundo
     
     
-    meter = random.randint(1,10)#gera a medição
+    meter = random.randint(1,100)#gera a medição
 
     ts = time.time()#gera o timestamp
     
-    msg = ("01;%s;%s"%(str(meter),str(ts))) #prepara a msg
+    msg = ("%s;%s;%s"%(criarHash(id_medidor),str(meter),str(ts))) #prepara a msg
 
     hash_msg = criarHash(msg) #hash da mensagem
     
@@ -73,4 +76,4 @@ while i <5000000:
     tcp.send (a)
     
     tcp.close()
-
+sys.exit(0)
