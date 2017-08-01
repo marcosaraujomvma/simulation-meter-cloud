@@ -32,7 +32,7 @@ def saveTime(n_meter, dtime):
 def saveDb(id_medidor,fatura,signature,conferir):
     con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
     bd=con.cursor()
-    sql="INSERT INTO fatura (id_meter, fatura,signature,conferencia) VALUES('%s','%s','%s','%s')"%(id_medidor,fatura,signature,conferir)
+    sql="INSERT INTO faturas (id_medidor, fatura,signature,conferencia) VALUES('%s','%s','%s','%s')"%(id_medidor,fatura,signature,conferir)
     #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
     #sql="INSERT INTO tempo (n_meter,naturetempo)VALUES('%s','%s')"%(n_meter,dtime))
     bd.execute(sql)
@@ -151,8 +151,8 @@ while True:
 	
 	time_start = time.time()
 	id_medidor, op, hash_chain, ts_start, ts_final = fazerConsulta()
-	msg = ("%s;%s;%s"%(op,ts_start,ts_final) #prepara a ms
-	hash_msg = criarHash(msg) #hash da mensagem
+	msg = ("%s;%s;%s"%(op,ts_start,ts_final)) #prepara a ms
+	hash_msg = criarHash(msg)#hash da mensagem
 	signature = keypr.sign(hash_msg,"") #assina a mensagem
 	saveDb(id_medidor,op,str(signature),"ok")
 	time_end = time.time()
