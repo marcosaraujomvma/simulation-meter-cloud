@@ -15,6 +15,30 @@ import time,random
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 8090            # Porta que o Servidor esta
 
+fprcl = open("keys/inmetro-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
+keypr = RSA.importKey(fprcl.read())#importa a chave privada
+print "LEU CHAVE PRIVADA DO INMETRO\n"
+
+def saveTime(n_meter, dtime):
+    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    bd=con.cursor()
+    sql="INSERT INTO tempo_agrega (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
+    #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
+    #sql="INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
+    bd.execute(sql)
+    con.commit()
+    con.close()
+
+def saveDb(id_medidor,fatura,signature,conferir):
+    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    bd=con.cursor()
+    sql="INSERT INTO fatura (id_meter, fatura,signature,conferencia) VALUES('%s','%s','%s','%s')"%(id_medidor,fatura,signature,conferir)
+    #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
+    #sql="INSERT INTO tempo (n_meter,naturetempo)VALUES('%s','%s')"%(n_meter,dtime))
+    bd.execute(sql)
+    con.commit()
+    con.close()
+
 
 def criarHash(texto):
     """
@@ -109,10 +133,10 @@ def fazerConsulta():
         hashconf = hashconf + criarHash(inmetro_id[i]+message+inmetro_ts[i])
     
     
-        print message,"\n"
+        #print message,"\n"
         
         
-    print hashconf,"\n"
+    #print hashconf,"\n"
         #print(message.decode('utf-8'))
     
     
@@ -125,6 +149,13 @@ def fazerConsulta():
 
 while True:
 	
+	time_start = time.time()
 	id_medidor, op, hash_chain, ts_start, ts_final = fazerConsulta()
+	msg = ("%s;%s;%s"%(op,ts_start,ts_final) #prepara a ms
+	hash_msg = criarHash(msg) #hash da mensagem
+	signature = keypr.sign(hash_msg,"") #assina a mensagem
+	saveDb(id_medidor,op,str(signature),"ok")
+	time_end = time.time()
+	saveTime("1",time_end - time_start)
 	time.sleep(5)
 #pkg = "%s;%s;%s;%s;%s"%(id_medidor,op,hash_chain, ts_start, ts_final)

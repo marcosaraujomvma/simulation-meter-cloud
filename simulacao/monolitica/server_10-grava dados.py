@@ -29,7 +29,7 @@ print "LEU CHAVE PRUBLICA 1024 do MEDIDOR \n"
 def saveTime(n_meter, dtime):
     con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
     bd=con.cursor()
-    sql="INSERT INTO tempo (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
+    sql="INSERT INTO tempo_recebe (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
     #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
     #sql="INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
     bd.execute(sql)
