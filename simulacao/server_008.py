@@ -1,6 +1,6 @@
 #Servidor
 # -*- coding: utf-8 -*-
-import audit
+#import audit
 import socket
 import thread,time
 from Crypto.Hash import SHA256
@@ -9,9 +9,9 @@ from Crypto import Random
 from Crypto.Cipher import AES
 import base64
 from Crypto.Util.randpool import RandomPool
-import psycopg2
+#import psycopg2
 import hashlib, ssl
-import auditinmetro
+#import auditinmetro
 
 
 BLOCK_SIZE=32

@@ -15,12 +15,14 @@ import time,random
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 8090            # Porta que o Servidor esta
 
+nmeter=90 #quantidade de medidores
+
 fprcl = open("keys/inmetro-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
 keypr = RSA.importKey(fprcl.read())#importa a chave privada
 print "LEU CHAVE PRIVADA DO INMETRO\n"
 
 def saveTime(n_meter, dtime):
-    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    con = psycopg2.connect(host='localhost', port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_mono')
     bd=con.cursor()
     sql="INSERT INTO tempo_agrega (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
     #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
@@ -30,7 +32,7 @@ def saveTime(n_meter, dtime):
     con.close()
 
 def saveDb(id_medidor,fatura,signature,conferir):
-    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    con = psycopg2.connect(host='localhost', port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_mono')
     bd=con.cursor()
     sql="INSERT INTO faturas (id_medidor, fatura,signature,conferencia) VALUES('%s','%s','%s','%s')"%(id_medidor,fatura,signature,conferir)
     #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
@@ -56,7 +58,7 @@ def pegaBancoInmetro(id_meter,ts_start,ts_end):
     lista_ts_medidor = []
     try: 
     
-        con = psycopg2.connect(host='192.168.122.232', user='postgres', password='postgres',dbname='inmetrobd')
+        con = psycopg2.connect(host='localhost', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_mono')
         #print con
         bd = con.cursor(cursor_factory = psycopg2.extras.DictCursor)
         #bd = con.cursor()
@@ -103,9 +105,9 @@ def enviaDados(msg):
     
 def fazerConsulta():
     #w = []
-    id_medidor = random.randint(1,10)#raw_input("Digite o id do medidor:\n")
+    id_medidor = random.randint(1,10) #raw_input("Digite o id do medidor:\n")
     ts_inicial = (time.time()) - 5 #raw_input("Digite o periodo Inicial: \n")
-    ts_final = time.time()#raw_input("Digite o periodo Final: \n")
+    ts_final = time.time() #raw_input("Digite o periodo Final: \n")
     
     inmetro_id,inmetro_leitura,inmetro_ts = pegaBancoInmetro(criarHash(str(id_medidor)),ts_inicial,ts_final)
     
@@ -156,6 +158,6 @@ while True:
 	signature = keypr.sign(hash_msg,"") #assina a mensagem
 	saveDb(id_medidor,op,str(signature),"ok")
 	time_end = time.time()
-	saveTime("1",time_end - time_start)
+	saveTime(str(nmeter),time_end - time_start)
 	time.sleep(5)
 #pkg = "%s;%s;%s;%s;%s"%(id_medidor,op,hash_chain, ts_start, ts_final)

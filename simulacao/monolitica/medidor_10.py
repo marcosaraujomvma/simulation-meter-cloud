@@ -61,18 +61,18 @@ while i <2880:
     strmsg=("%s;%s"%(msg,str(signature))) #tranforma em string a mensagem para enviar
     
     enc = keypucl.encrypt(strmsg,4096) #criptografa a mensagem para enviar com a chave publica da nuvem
-    print "MENSAGEM CRIPTOGRAFADA"
+    #print "MENSAGEM CRIPTOGRAFADA"
      
-    print strmsg
-    print (type(enc))
-    print "MENSAGEM CRIPTOGRAFADA"
+    #print strmsg
+    #print (type(enc))
+    #print "MENSAGEM CRIPTOGRAFADA"
     #print (enc)
     i += 1
     a, = enc
     #print a
-    print type(a)
+    #print type(a)
     
-    
+    print "Numero de Pacotes Enviados (%i) \n\n"%(i)
     tcp.send (a)
     
     tcp.close()

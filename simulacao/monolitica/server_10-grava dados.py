@@ -13,8 +13,7 @@ import time
 
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 10010            # Porta que o Servidor esta
-
-
+nmeter = 90
 
 fprcl = open("keys/cloud-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
 keyprcl = RSA.importKey(fprcl.read())#importa a chave privada
@@ -27,7 +26,7 @@ print "LEU CHAVE PRUBLICA 1024 do MEDIDOR \n"
 
 
 def saveTime(n_meter, dtime):
-    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    con = psycopg2.connect(host='localhost', port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_mono')
     bd=con.cursor()
     sql="INSERT INTO tempo_recebe (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
     #sql = "INSERT INTO tempo (n_meter,tempo)VALUES('%s','%s')"%(n_meter,dtime))
@@ -87,7 +86,7 @@ def gravaBancoDadosInmetro(id_meter,metering,ts,signature):
         
     """
     metering_b64cipher = cryptText(metering)
-    con = psycopg2.connect(host='192.168.122.232', port='5432', user='postgres', password='postgres',dbname='inmetrobd')
+    con = psycopg2.connect(host='localhost', port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_mono')
     bd = con.cursor()
     """
     key = RSA.importKey(open('chaves/keypu.pem').read())
@@ -144,7 +143,7 @@ def conectado(con, cliente):
         if True:
 			gravaBancoDadosInmetro(id_medidor,leitura,ts_medidor,assinatura)
 			end = time.time()
-			saveTime("1",end-start)
+			saveTime(str(nmeter),end-start) #grava o tempo de processamento 
 			
 			thread.exit()
 		#print 'Finalizando conexao do cliente', cliente
