@@ -13,7 +13,7 @@ import time
 
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 10010            # Porta que o Servidor esta
-nmeter = 90
+nmeter = 200
 
 fprcl = open("keys/cloud-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
 keyprcl = RSA.importKey(fprcl.read())#importa a chave privada
