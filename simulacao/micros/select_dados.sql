@@ -1,0 +1,1 @@
+﻿SELECT AVG (tempo) AS media FROM tempo_recebe WHERE n_meter = '1';
