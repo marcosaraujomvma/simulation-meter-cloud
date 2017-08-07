@@ -9,13 +9,13 @@ from psycopg2 import extras
 from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 import base64
-import time,random
+import time,random, sys
 
 
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 8090            # Porta que o Servidor esta
 
-nmeter=200 #quantidade de medidores
+nmeter= sys.argv[1] #quantidade de medidores
 
 fprcl = open("keys/inmetro-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
 keypr = RSA.importKey(fprcl.read())#importa a chave privada

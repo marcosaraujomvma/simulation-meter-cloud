@@ -8,12 +8,12 @@ import hashlib
 import psycopg2
 from Crypto.Cipher import PKCS1_OAEP
 import base64
-import time
+import time, sys
 
 
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 10010            # Porta que o Servidor esta
-nmeter = 200
+nmeter = sys.argv[1]
 
 fprcl = open("keys/cloud-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
 keyprcl = RSA.importKey(fprcl.read())#importa a chave privada
