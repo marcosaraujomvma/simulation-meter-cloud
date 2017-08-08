@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
-
+#Servidor Socket com thread concorrentes-
 #python 2.7
-
-from Crypto.PublicKey import RSA
 import socket
-import thread
+
+import hashlib 
 import psycopg2
-import hashlib
+from Crypto.PublicKey import RSA
 from Crypto.Cipher import PKCS1_OAEP
 import base64
 
-HOST = ''              # Endereco IP do Servidor
-PORT = 8087            # Porta que o Servidor esta
+
+HOST = 'localhost'              # Endereco IP do Servidor
+PORT = 8090            # Porta que o Servidor esta
+
 
 def criarHash(texto):
     """
@@ -23,19 +24,16 @@ def criarHash(texto):
 
 
 def pegaBancoInmetro(id_meter,ts_start,ts_end):
-    
+
     lista_id_medidor = []
     lista_leitura = []
     lista_ts_medidor = []
     try: 
     
         con = psycopg2.connect(host='192.168.122.232', user='postgres', password='postgres',dbname='inmetrobd')
-        
         #print con
-        #bd = con.cursor(cursor_factory = psycopg2.extras.DictCursor)
-        
-        bd = con.cursor()
-        print "retournou aqui!!!!!!!!!!!!!!!"
+        bd = con.cursor(cursor_factory = psycopg2.extras.DictCursor)
+        #bd = con.cursor()
         #print bd
         sql = "select (id_medidor,leitura,ts_medidor) from logmedidores where id_medidor = '%s' and ts_medidor between '%s' and '%s'"%(id_meter,ts_start,ts_end)
         
@@ -53,7 +51,7 @@ def pegaBancoInmetro(id_meter,ts_start,ts_end):
             lista_id_medidor.append(sp[0])
             lista_leitura.append(sp[1])
             lista_ts_medidor.append(sp[2])
-        print "retournou aqui"
+        #print "retournou aqui"
 
         
         #print (lista_id_medidor,lista_leitura,lista_ts_medidor)
@@ -62,31 +60,26 @@ def pegaBancoInmetro(id_meter,ts_start,ts_end):
     except:
         print "erro!!!"        
 
-
-
-def splitFrame(frame):
-    """
-    Função para separar os dados do Frame Recebido
-    """
-    split = frame.split(";")
-    #print split
-    id_medidor =  split[0]#
-    op =  split[1]
-    hash_chain = split[2]
-    ts_start = split[3]
-    ts_end = split[4]
-    #assinatura_str_tupla = split[3]
-    #assinatura_str = assinatura_str_tupla[1:len(assinatura_str_tupla)-2]
-    #assinatura_long = long(assinatura_str)
-    #assinatura_long_tupla = (assinatura_long,) 
-
-    return (id_medidor,op,hash_chain,ts_start,ts_end)
-
-def fazerConsulta(id_medidor, ts_inicial, ts_final):
+def enviaDados(msg):
+    
+    HOST = 'localhost'     # Endereco IP do Servidor
+    PORT = 8087           # Porta que o Servidor esta
+    tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    dest = (HOST, PORT)
+    tcp.connect(dest)
+    #print 'Para sair use CTRL+X\n'
+    
+    #while msg <> '\x18':
+    tcp.send (msg)
+        
+    tcp.close()
+    
+    
+def fazerConsulta():
     #w = []
-    #id_medidor = raw_input("Digite o id do medidor:\n")
-    #ts_inicial = raw_input("Digite o periodo Inicial: \n")
-    #ts_final = raw_input("Digite o periodo Final: \n")
+    id_medidor = raw_input("Digite o id do medidor:\n")
+    ts_inicial = raw_input("Digite o periodo Inicial: \n")
+    ts_final = raw_input("Digite o periodo Final: \n")
     
     inmetro_id,inmetro_leitura,inmetro_ts = pegaBancoInmetro(criarHash(id_medidor),ts_inicial,ts_final)
     
@@ -114,38 +107,35 @@ def fazerConsulta(id_medidor, ts_inicial, ts_final):
         hashconf = hashconf + criarHash(inmetro_id[i]+message+inmetro_ts[i])
     
     
-    print hashconf
-    return hashconf
+        print message,"\n"
+        
+        
+    print hashconf,"\n"
+        #print(message.decode('utf-8'))
+    
+    
+    print soma
+    
+    return id_medidor, soma, hashconf, ts_inicial,ts_final 
+    #print inmetro_id
+    #print inmetro_leitura
+    #print inmetro_ts
 
-
+id_medidor, op, hash_chain, ts_start, ts_final = fazerConsulta()
+pkg = "%s;%s;%s;%s;%s"%(id_medidor,op,hash_chain, ts_start, ts_final)
+enviaDados(pkg)
+"""
 def conectado(con, cliente):
     print 'Conectado por', cliente
 
     while True:
-        msg = con.recv(1024)
+        msg = con.recv(4096)
         if not msg: break
-        print cliente
-        
-        id_medidor,op,hash_chain, ts_start, ts_end = splitFrame(msg)
- 
-        print id_medidor
-        #print op
-        print hash_chain,"\n\n"
-        
-        print ts_start,"\n"
-        
-        print ts_end,"\n"
-        """    
-        inmetro_id,inmetro_leitura,inmetro_ts = pegaBancoInmetro(criarHash(id_medidor),ts_start,ts_end)
+        print cliente, msg
 
-        for i in range(len(inmetro_leitura)):
-        """
-        hash_bd = fazerConsulta(id_medidor, ts_start, ts_end)
         
-        if hash_chain == hash_bd:
-            print "ok!!!!!!!!!!!!!!\n\n\n"
-        else:
-            print "Erro nos pacotes para o Calculo!!!!"
+
+        #enviaDados(msg)
 
     print 'Finalizando conexao do cliente', cliente
     con.close()
@@ -163,3 +153,4 @@ while True:
     thread.start_new_thread(conectado, tuple([con, cliente]))
 
 tcp.close()
+"""

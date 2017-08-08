@@ -45,7 +45,7 @@ while i <2880:
     dest = (HOST, PORT)   
     tcp.connect(dest)
  
-    time.sleep(1)#espera 1 segundo
+    time.sleep(2)#espera 1 segundo
     
     
     meter = random.randint(1,100)#gera a medição

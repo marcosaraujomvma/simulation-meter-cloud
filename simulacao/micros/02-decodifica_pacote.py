@@ -64,24 +64,23 @@ def conectado(con, cliente):
     #print 'Conectado por', cliente
    
     while True:
-        msg = con.recv(1024)
+        msg = con.recv(8192000)
         if not msg: break
         con.close()
+        
         split = msg.split(";/")
         cod = split[0]
         tempo = split[1]
-        #print tempo
+        
         
         tupla = (cod,)
         
-        #print tupla
+        
         
         dec = keyprcl.decrypt(tupla)
-        
-        #print dec
-        
+               
     
-        dec = keyprcl.decrypt(tupla)
+        #dec = keyprcl.decrypt(tupla)
     
         
         id_medidor,leitura,ts_medidor,assinatura = splitFrame(dec)
@@ -92,6 +91,7 @@ def conectado(con, cliente):
         hash_msg = criarHash(pkg)
                   
         z = pubkey.verify(hash_msg,assinatura)
+        
         if z == True:
 		#print "ASSINATURA OK"
 		send = "%s;%s;%s;%s;%s"%(id_medidor,leitura,ts_medidor,assinatura,tempo)

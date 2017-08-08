@@ -13,8 +13,10 @@ HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 8087            # Porta que o Servidor esta
 
 nmeter = sys.argv[1]
+cont =1
 
 def saveTime(n_meter, dtime):
+    global cont
     con = psycopg2.connect(host='192.168.122.232', port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_micro')
     bd=con.cursor()
     sql="INSERT INTO tempo_recebe (n_meter,tempo) VALUES('%s','%s')"%(n_meter,dtime)
@@ -23,6 +25,8 @@ def saveTime(n_meter, dtime):
     bd.execute(sql)
     con.commit()
     con.close()
+    print "%i DADOS COLETADOS\n"%cont
+    cont = cont + 1
 
 def cryptText(plain_text):
     
@@ -64,6 +68,8 @@ def gravaBancoDadosInmetro(id_meter,metering,ts,signature):
         
     """
     
+    metering_b64cipher = cryptText(metering)#Encrypts the text and returns the text encrypted in UTF-8 base64
+    
     con = psycopg2.connect(host='192.168.122.232',port='5432', user='inmetro', password='lsdinmetrolsdlsd',dbname='bd_micro')
     bd = con.cursor()
     """
@@ -74,7 +80,7 @@ def gravaBancoDadosInmetro(id_meter,metering,ts,signature):
     #print (base64.b64encode(ciphertext))
     b64cipher = base64.b64encode(ciphertext)
     """
-    metering_b64cipher = cryptText(metering) #Encrypts the text and returns the text encrypted in UTF-8 base64
+     
     
     sql = "INSERT INTO logmedidores (id_medidor,leitura,ts_medidor,assinatura)VALUES ('%s','%s','%s','%s')"%(id_meter,metering_b64cipher,ts,str(signature))
 
@@ -91,7 +97,7 @@ def conectado(con, cliente):
   
 
     while True:
-        msg = con.recv(1024)
+        msg = con.recv(8192)
         if not msg: break
         con.close()
         id_medidor,leitura,ts_medidor,assinatura,tempo = splitFrame(msg)
