@@ -27,7 +27,7 @@ keypucl = RSA.importKey(fpucl.read())
 print "LEU CHAVE PUBLICA 4096 DA NUVEM \n"
 
 HOST = 'localhost'     # Endereco IP do Servidor
-PORT = 10010            # Porta que o Servidor esta
+PORT = 8085            # Porta que o Servidor esta
 #tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 #dest = (HOST, PORT)
 #tcp.connect(dest)

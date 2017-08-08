@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 #Servidor Socket com thread concorrentes-
 #python 2.7
-import socket, thread
+import socket, thread,time
 
-from Crypto.PublicKey import RSA
 
 HOST = 'localhost'              # Endereco IP do Servidor
 PORT = 8085            # Porta que o Servidor esta
@@ -16,35 +15,29 @@ def enviaDados(msg):
     tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     dest = (HOST, PORT)
     tcp.connect(dest)
-    #print 'Para sair use CTRL+X\n'
-    
-    #while msg <> '\x18':
-    tcp.send (msg)
-        
+    tcp.send (msg)       
     tcp.close()
 
 def conectado(con, cliente):
-    print 'Conectado por', cliente
-
+    #print 'Conectado por', cliente
+    #print "RECEBER PACOTE OK""""
     while True:
         msg = con.recv(4096)
         if not msg: break
-        print cliente, msg
-
-        
-
-        enviaDados(msg)
-
-    print 'Finalizando conexao do cliente', cliente
-    con.close()
-    thread.exit()
+        con.close()
+        tempo_start = time.time()
+        pkg = ("%s;/%s"%(msg,tempo_start)) #prepara a msg
+        enviaDados(pkg)
+    	thread.exit()
 
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 orig = (HOST, PORT)
 
 tcp.bind(orig)
-tcp.listen(1)
+tcp.listen(-1)
+
+print "RECEBER PACOTE OK"
 
 while True:
     con, cliente = tcp.accept()
