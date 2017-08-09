@@ -13,6 +13,14 @@ import base64
 HOST = ''              # Endereco IP do Servidor
 PORT = 8090            # Porta que o Servidor esta
 
+fprcl = open("keys/inmetro-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
+keypr = RSA.importKey(fprcl.read())#importa a chave privada
+print "LEU CHAVE PRIVADA DO INMETRO\n"
+
+key = RSA.importKey(open('keys/inmetro-private.pem').read())
+cipher = PKCS1_OAEP.new(key)
+
+
 def criarHash(texto):
     """
     Funçãor responsavel em criar Hash com algoritmo SHA 256
@@ -91,8 +99,8 @@ def fazerConsulta(id_medidor, ts_start, ts_end):
     hashconf=""
     soma = 0
     
-    key = RSA.importKey(open('keys/inmetro-private.pem').read())
-    cipher = PKCS1_OAEP.new(key)
+    #key = RSA.importKey(open('keys/inmetro-private.pem').read())
+    #cipher = PKCS1_OAEP.new(key)
 
     tam = len(inmetro_leitura)
     #print tam
@@ -118,6 +126,26 @@ def fazerConsulta(id_medidor, ts_start, ts_end):
     return hashconf
 
 
+def enviaDados(msg):
+    try:
+        
+        HOST = 'localhost'     # Endereco IP do Servidor
+        PORT = 8091          # Porta que o Servidor esta
+        tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        dest = (HOST, PORT)
+        tcp.connect(dest)
+        
+        tcp.send (msg)
+            
+        tcp.close()
+    
+    except:
+        
+        print "ERRO AO ENVIAR"
+
+
+
+
 def conectado(con, cliente):
     #print 'Conectado por', cliente
 
@@ -135,9 +163,23 @@ def conectado(con, cliente):
         
         if hash_chain == hash_bd:
             print "CONFERIDO CORRETO!\n\n\n"
+            pkg = ("%s;%s;%s;%s"%(id_medidor,op,ts_start,ts_end))
+            hash_pkg = criarHash(pkg)#hash da mensagem
+            signature = keypr.sign(hash_pkg,"")
+            #saveDb(id_medidor,op,str(signature),"ok")
+            send= ("%s;%s;%s;%s"%(id_medidor,op,str(signature),tempo))
+            enviaDados(send)
+            
             thread.exit()
         else:
             print "Erro nos pacotes para o Calculo!!!!"
+            thread.exit()
+
+
+fprcl = open("keys/inmetro-private.pem")#CAMINHO DA CHAVE PRIVADA DA NUVEM
+keypr = RSA.importKey(fprcl.read())#importa a chave privada
+print "LEU CHAVE PRIVADA DO INMETRO\n"
+
 
 tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
